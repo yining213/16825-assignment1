@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16-825 Assignment 1: Rendering Basics with PyTorch3D</title>
+<style>
+  :root {
+    --bg: #fbfbfa;
+    --panel: #ffffff;
+    --ink: #1c1c1a;
+    --muted: #6b6b66;
+    --line: #e3e2dd;
+    --accent: #7a3e12;
+    --accent-soft: #f4ece4;
+    --code-bg: #f3f2ee;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #15150e;
+      --panel: #1d1d18;
+      --ink: #ecebe5;
+      --muted: #9d9c93;
+      --line: #33322b;
+      --accent: #e0a06a;
+      --accent-soft: #2a231c;
+      --code-bg: #26251f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 20px 96px; }
+
+  header.page {
+    border-bottom: 1px solid var(--line);
+    padding-block: 56px 32px;
+    margin-bottom: 40px;
+  }
+  header.page .course {
+    font-size: 13px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin: 0 0 10px;
+  }
+  header.page h1 { font-size: 34px; line-height: 1.2; margin: 0 0 14px; font-weight: 650; letter-spacing: -.015em; }
+  header.page .byline { color: var(--muted); margin: 0; font-size: 15px; }
+
+  nav.toc {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px 24px; margin-bottom: 48px;
+  }
+  nav.toc h2 { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  nav.toc ol { margin: 0; padding-left: 20px; columns: 2; column-gap: 32px; }
+  @media (max-width: 620px) { nav.toc ol { columns: 1; } }
+  nav.toc li { margin-bottom: 6px; break-inside: avoid; }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { border-bottom-color: var(--accent); }
+
+  section.q { margin-bottom: 64px; scroll-margin-top: 24px; }
+  section.q > h2 {
+    font-size: 24px; margin: 0 0 4px; font-weight: 650; letter-spacing: -.01em;
+    padding-bottom: 10px; border-bottom: 2px solid var(--line);
+  }
+  .subq { margin-top: 36px; scroll-margin-top: 24px; }
+  .subq h3 { font-size: 18px; margin: 0 0 2px; font-weight: 620; }
+  .points { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 8px; }
+  .prompt {
+    color: var(--muted); font-size: 14.5px; margin: 8px 0 18px;
+    border-left: 3px solid var(--line); padding-left: 14px;
+  }
+
+  figure { margin: 0 0 12px; }
+  figure img { display: block; max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); }
+  figcaption { font-size: 13.5px; color: var(--muted); margin-top: 8px; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  .row > figure { flex: 1 1 240px; min-width: 0; }
+
+  .pending {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    min-height: 168px; padding: 24px;
+    border: 1.5px dashed var(--line); border-radius: 8px;
+    color: var(--muted); font-size: 13.5px; background: var(--panel);
+  }
+  .pending code { font-size: 12.5px; }
+
+  .answer { background: var(--accent-soft); border-radius: 8px; padding: 16px 18px; margin: 16px 0; }
+  .answer h4 { margin: 0 0 8px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .answer p:last-child, .answer ul:last-child { margin-bottom: 0; }
+  .answer .todo { color: var(--muted); font-style: italic; }
+
+  code, kbd { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em;
+              background: var(--code-bg); padding: .15em .4em; border-radius: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; overflow-x: auto; }
+  pre code { background: none; padding: 0; }
+
+  .tag { display: inline-block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+         padding: 3px 8px; border-radius: 999px; vertical-align: middle; margin-left: 8px; font-weight: 600; }
+  .tag.done { background: #d8ecd8; color: #24601f; }
+  .tag.todo { background: var(--code-bg); color: var(--muted); }
+  .tag.ec   { background: var(--accent-soft); color: var(--accent); }
+  @media (prefers-color-scheme: dark) { .tag.done { background: #23361f; color: #a6d49c; } }
+
+  footer.page { border-top: 1px solid var(--line); padding-top: 20px; color: var(--muted); font-size: 13.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="page">
+  <p class="course">16-825 &middot; Learning for 3D Vision</p>
+  <h1>Assignment 1: Rendering Basics with PyTorch3D</h1>
+  <!-- TODO: add your full name -->
+  <p class="byline">Andrew ID: <strong>yiningh3</strong></p>
+</header>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#q1">Practicing with Cameras</a></li>
+    <li><a href="#q2">Practicing with Meshes</a></li>
+    <li><a href="#q3">Re-texturing a Mesh</a></li>
+    <li><a href="#q4">Camera Transformations</a></li>
+    <li><a href="#q5">Rendering Generic 3D Representations</a></li>
+    <li><a href="#q6">Do Something Fun <em>(extra credit)</em></a></li>
+    <li><a href="#q7">Sampling Points on Meshes <em>(extra credit)</em></a></li>
+  </ol>
+</nav>
+
+<!-- ============================ 1 ============================ -->
+<section class="q" id="q1">
+  <h2>1. Practicing with Cameras <span class="points">15 points</span></h2>
+
+  <div class="subq" id="q1-1">
+    <h3>1.1 360-degree Renders <span class="points">5 points</span><span class="tag done">done</span></h3>
+    <p class="prompt">A gif showing the cow mesh from many continuously changing viewpoints, by
+      constructing a set of camera extrinsics around the mesh and rendering one frame per azimuth.</p>
+
+    <figure>
+      <img src="data/q1_1_cow_360.gif" alt="360-degree turntable render of the cow mesh" width="256">
+      <figcaption>Cow mesh rendered from 36 azimuths (&minus;180&deg; to 170&deg;, 10&deg; steps), distance 3,
+        elevation 0&deg;, 60&deg; FOV, at 15 fps.</figcaption>
+    </figure>
+
+    <div class="answer">
+      <h4>Approach</h4>
+      <p>The camera is placed on a circle around the origin with
+        <code>look_at_view_transform(dist=3, elev=0, azim=azim)</code> and a
+        <code>FoVPerspectiveCameras</code> with a 60&deg; field of view. The mesh is built once and
+        reused across frames; each rendered frame is clipped to <code>[0, 1]</code>, converted to
+        <code>uint8</code>, and the stack is written out with <code>imageio.mimsave</code>.</p>
+    </div>
+  </div>
+
+  <div class="subq" id="q1-2">
+    <h3>1.2 Re-creating the Dolly Zoom <span class="points">10 points</span><span class="tag todo">todo</span></h3>
+    <p class="prompt">A gif of the dolly zoom effect: the field of view widens while the camera moves
+      toward the subject so the subject stays the same size in frame.</p>
+
+    <!-- Replace the .pending block with:
+         <figure><img src="data/q1_2_dolly_zoom.gif" alt="Dolly zoom"><figcaption>...</figcaption></figure> -->
+    <div class="pending">Pending &mdash; drop the gif at <code>data/q1_2_dolly_zoom.gif</code></div>
+  </div>
+</section>
+
+<!-- ============================ 2 ============================ -->
+<section class="q" id="q2">
+  <h2>2. Practicing with Meshes <span class="points">10 points</span></h2>
+
+  <div class="subq" id="q2-1">
+    <h3>2.1 Constructing a Tetrahedron <span class="points">5 points</span><span class="tag todo">todo</span></h3>
+    <p class="prompt">A 360-degree gif of a tetrahedron mesh constructed from scratch, plus the number
+      of vertices and faces it uses.</p>
+
+    <div class="pending">Pending &mdash; drop the gif at <code>data/q2_1_tetrahedron.gif</code></div>
+
+    <div class="answer">
+      <h4>Vertices and faces</h4>
+      <p class="todo">A tetrahedron uses __ vertices and __ triangle faces. (Fill in and justify.)</p>
+    </div>
+  </div>
+
+  <div class="subq" id="q2-2">
+    <h3>2.2 Constructing a Cube <span class="points">5 points</span><span class="tag todo">todo</span></h3>
+    <p class="prompt">A 360-degree gif of a cube mesh, plus the number of vertices and faces used.</p>
+
+    <div class="pending">Pending &mdash; drop the gif at <code>data/q2_2_cube.gif</code></div>
+
+    <div class="answer">
+      <h4>Vertices and faces</h4>
+      <p class="todo">The cube uses __ vertices and __ triangle faces (two triangles per square side).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 3 ============================ -->
+<section class="q" id="q3">
+  <h2>3. Re-texturing a Mesh <span class="points">10 points</span><span class="tag todo">todo</span></h2>
+  <p class="prompt">Re-texture the cow so color varies smoothly front to back, interpolating per vertex
+    between <code>color1</code> at <code>z_min</code> and <code>color2</code> at <code>z_max</code>:
+    <code>color = alpha * color2 + (1 - alpha) * color1</code>.</p>
+
+  <div class="pending">Pending &mdash; drop the gif at <code>data/q3_retextured_cow.gif</code></div>
+
+  <div class="answer">
+    <h4>Color choice</h4>
+    <p class="todo"><code>color1 = [_, _, _]</code> and <code>color2 = [_, _, _]</code> &mdash; describe why.</p>
+  </div>
+</section>
+
+<!-- ============================ 4 ============================ -->
+<section class="q" id="q4">
+  <h2>4. Camera Transformations <span class="points">10 points</span><span class="tag todo">todo</span></h2>
+  <p class="prompt">For each target view, find <code>(R_relative, T_relative)</code> such that
+    <code>R = R_relative @ R_0</code> and <code>T = R_relative @ T_0 + T_relative</code>, and describe
+    in words what each transformation does.</p>
+
+  <div class="row">
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q4_transform1.jpg</code></div>
+      <figcaption>Transform 1 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+    </figure>
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q4_transform2.jpg</code></div>
+      <figcaption>Transform 2 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+    </figure>
+  </div>
+  <div class="row">
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q4_transform3.jpg</code></div>
+      <figcaption>Transform 3 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+    </figure>
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q4_transform4.jpg</code></div>
+      <figcaption>Transform 4 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================ 5 ============================ -->
+<section class="q" id="q5">
+  <h2>5. Rendering Generic 3D Representations <span class="points">45 points</span></h2>
+
+  <div class="subq" id="q5-1">
+    <h3>5.1 Rendering Point Clouds from RGB-D Images <span class="points">10 points</span><span class="tag todo">todo</span></h3>
+    <p class="prompt">Unproject two RGB-D plant images into point clouds and render three gifs
+      side-by-side: the first image's cloud, the second image's cloud, and their union.</p>
+
+    <div class="row">
+      <figure>
+        <div class="pending">Pending &mdash; <code>data/q5_1_pointcloud1.gif</code></div>
+        <figcaption>Point cloud from image 1</figcaption>
+      </figure>
+      <figure>
+        <div class="pending">Pending &mdash; <code>data/q5_1_pointcloud2.gif</code></div>
+        <figcaption>Point cloud from image 2</figcaption>
+      </figure>
+      <figure>
+        <div class="pending">Pending &mdash; <code>data/q5_1_pointcloud_union.gif</code></div>
+        <figcaption>Union of both point clouds</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="subq" id="q5-2">
+    <h3>5.2 Parametric Functions <span class="points">10 + 5 points</span><span class="tag todo">todo</span></h3>
+    <p class="prompt">A 360-degree gif of a torus point cloud sampled from its parametric function
+      (with the hole visible), plus a second gif of any new object of your choice.</p>
+
+    <div class="row">
+      <figure>
+        <div class="pending">Pending &mdash; <code>data/q5_2_torus.gif</code></div>
+        <figcaption>Torus point cloud</figcaption>
+      </figure>
+      <figure>
+        <div class="pending">Pending &mdash; <code>data/q5_2_custom.gif</code></div>
+        <figcaption><span class="todo">New parametric object &mdash; name it</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="subq" id="q5-3">
+    <h3>5.3 Implicit Surfaces <span class="points">15 + 5 points</span><span class="tag todo">todo</span></h3>
+    <p class="prompt">A 360-degree gif of a torus rendered as a mesh from an implicit function, a
+      discussion of mesh vs. point cloud tradeoffs, and a gif of another object of your choice.</p>
+
+    <div class="row">
+      <figure>
+        <div class="pending">Pending &mdash; <code>data/q5_3_torus_mesh.gif</code></div>
+        <figcaption>Torus mesh from an implicit function</figcaption>
+      </figure>
+      <figure>
+        <div class="pending">Pending &mdash; <code>data/q5_3_custom.gif</code></div>
+        <figcaption><span class="todo">New implicit object &mdash; name it</span></figcaption>
+      </figure>
+    </div>
+
+    <div class="answer">
+      <h4>Mesh vs. point cloud tradeoffs</h4>
+      <p class="todo">Compare rendering speed, rendering quality, memory usage, and ease of use.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 6 ============================ -->
+<section class="q" id="q6">
+  <h2>6. Do Something Fun <span class="tag ec">extra credit &middot; +10</span><span class="tag todo">todo</span></h2>
+  <p class="prompt">A creative use of the tools from this assignment.</p>
+
+  <div class="pending">Pending &mdash; drop the result at <code>data/q6_fun.gif</code></div>
+
+  <div class="answer">
+    <h4>What this is</h4>
+    <p class="todo">Describe what you made and how.</p>
+  </div>
+</section>
+
+<!-- ============================ 7 ============================ -->
+<section class="q" id="q7">
+  <h2>7. Sampling Points on Meshes <span class="tag ec">extra credit &middot; +10</span><span class="tag todo">todo</span></h2>
+  <p class="prompt">Uniformly sample the cow mesh surface via stratified sampling (face area &rarr;
+    barycentric coordinate) at 10, 100, 1000, and 10000 points, each rendered side-by-side with the
+    original mesh.</p>
+
+  <div class="row">
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q7_sample_10.gif</code></div>
+      <figcaption>10 sampled points vs. cow mesh</figcaption>
+    </figure>
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q7_sample_100.gif</code></div>
+      <figcaption>100 sampled points vs. cow mesh</figcaption>
+    </figure>
+  </div>
+  <div class="row">
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q7_sample_1000.gif</code></div>
+      <figcaption>1000 sampled points vs. cow mesh</figcaption>
+    </figure>
+    <figure>
+      <div class="pending">Pending &mdash; <code>data/q7_sample_10000.gif</code></div>
+      <figcaption>10000 sampled points vs. cow mesh</figcaption>
+    </figure>
+  </div>
+</section>
+
+<footer class="page">
+  <p>Code for this assignment lives on the <code>master</code> branch of this repository.</p>
+</footer>
+
+</div>
+</body>
+</html>
