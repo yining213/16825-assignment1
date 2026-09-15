@@ -114,7 +114,7 @@
 <header class="page">
   <p class="course">16-825 &middot; Learning for 3D Vision</p>
   <h1>Assignment 1: Rendering Basics with PyTorch3D</h1>
-  <!-- TODO: add your full name -->
+  <p class="byline">Name: <strong>Yi-Ning Huang</strong></p>
   <p class="byline">Andrew ID: <strong>yiningh3</strong></p>
 </header>
 
@@ -137,33 +137,22 @@
 
   <div class="subq" id="q1-1">
     <h3>1.1 360-degree Renders <span class="points">5 points</span><span class="tag done">done</span></h3>
-    <p class="prompt">A gif showing the cow mesh from many continuously changing viewpoints, by
-      constructing a set of camera extrinsics around the mesh and rendering one frame per azimuth.</p>
-
     <figure>
       <img src="data/q1_1_cow_360.gif" alt="360-degree turntable render of the cow mesh" width="256">
-      <figcaption>Cow mesh rendered from 36 azimuths (&minus;180&deg; to 170&deg;, 10&deg; steps), distance 3,
-        elevation 0&deg;, 60&deg; FOV, at 15 fps.</figcaption>
+      <figcaption>The cow is rendered from 36 azimuth angles at 10&deg; intervals, with a camera
+        distance of 3, an elevation of 0&deg;, and a 60&deg; field of view.
+        Code: <code>part1_1.py</code></figcaption>
     </figure>
-
-    <div class="answer">
-      <h4>Approach</h4>
-      <p>The camera is placed on a circle around the origin with
-        <code>look_at_view_transform(dist=3, elev=0, azim=azim)</code> and a
-        <code>FoVPerspectiveCameras</code> with a 60&deg; field of view. The mesh is built once and
-        reused across frames; each rendered frame is clipped to <code>[0, 1]</code>, converted to
-        <code>uint8</code>, and the stack is written out with <code>imageio.mimsave</code>.</p>
-    </div>
   </div>
 
   <div class="subq" id="q1-2">
-    <h3>1.2 Re-creating the Dolly Zoom <span class="points">10 points</span><span class="tag todo">todo</span></h3>
-    <p class="prompt">A gif of the dolly zoom effect: the field of view widens while the camera moves
-      toward the subject so the subject stays the same size in frame.</p>
-
-    <!-- Replace the .pending block with:
-         <figure><img src="data/q1_2_dolly_zoom.gif" alt="Dolly zoom"><figcaption>...</figcaption></figure> -->
-    <div class="pending">Pending &mdash; drop the gif at <code>data/q1_2_dolly_zoom.gif</code></div>
+    <h3>1.2 Re-creating the Dolly Zoom <span class="points">10 points</span><span class="tag done">done</span></h3>
+    <figure>
+      <img src="data/q1_2_dolly.gif" alt="Dolly zoom on the cow-on-plane mesh" width="256">
+      <figcaption>The field of view increases from 5&deg; to 120&deg;, while the camera distance follows
+        <code>3 / tan(fov/2)</code> to keep the cow at a constant size in the frame.
+        Code: <code>starter/dolly_zoom.py</code></figcaption>
+    </figure>
   </div>
 </section>
 
@@ -172,72 +161,103 @@
   <h2>2. Practicing with Meshes <span class="points">10 points</span></h2>
 
   <div class="subq" id="q2-1">
-    <h3>2.1 Constructing a Tetrahedron <span class="points">5 points</span><span class="tag todo">todo</span></h3>
-    <p class="prompt">A 360-degree gif of a tetrahedron mesh constructed from scratch, plus the number
-      of vertices and faces it uses.</p>
-
-    <div class="pending">Pending &mdash; drop the gif at <code>data/q2_1_tetrahedron.gif</code></div>
-
+    <h3>2.1 Constructing a Tetrahedron <span class="points">5 points</span><span class="tag done">done</span></h3>
+    <figure>
+      <img src="data/q2_1_tetrahedron.gif" alt="360-degree render of a hand-built tetrahedron" width="256">
+      <figcaption>A tetrahedron rendered from 36 azimuth angles.</figcaption>
+    </figure>
     <div class="answer">
       <h4>Vertices and faces</h4>
-      <p class="todo">A tetrahedron uses __ vertices and __ triangle faces. (Fill in and justify.)</p>
+      <p>The tetrahedron contains <strong>4 vertices</strong> and <strong>4 triangular faces</strong>. Each
+        face corresponds to one of the <code>C(4,3) = 4</code> possible combinations of 3 vertices.
+      </p>
+      <p>Code: <code>part2.py</code></p>
     </div>
   </div>
 
   <div class="subq" id="q2-2">
-    <h3>2.2 Constructing a Cube <span class="points">5 points</span><span class="tag todo">todo</span></h3>
-    <p class="prompt">A 360-degree gif of a cube mesh, plus the number of vertices and faces used.</p>
-
-    <div class="pending">Pending &mdash; drop the gif at <code>data/q2_2_cube.gif</code></div>
-
+    <h3>2.2 Constructing a Cube <span class="points">5 points</span><span class="tag done">done</span></h3>
+    <figure>
+      <img src="data/q2_2_cube.gif" alt="360-degree render of a hand-built cube" width="256">
+      <figcaption>A unit cube spanning <code>[&minus;1, 1]&sup3;</code>, rendered from 36 azimuth angles
+        at an elevation of 20&deg;.</figcaption>
+    </figure>
     <div class="answer">
       <h4>Vertices and faces</h4>
-      <p class="todo">The cube uses __ vertices and __ triangle faces (two triangles per square side).</p>
+      <p>The cube contains <strong>8 vertices</strong> and <strong>12 triangular faces</strong>. The
+        vertices are located at the 8 corners <code>(&plusmn;1, &plusmn;1, &plusmn;1)</code>. Each of the
+        6 square sides is divided into 2 triangles.
+      </p>
+      <p>Code: <code>part2.py</code></p>
     </div>
   </div>
 </section>
 
 <!-- ============================ 3 ============================ -->
 <section class="q" id="q3">
-  <h2>3. Re-texturing a Mesh <span class="points">10 points</span><span class="tag todo">todo</span></h2>
-  <p class="prompt">Re-texture the cow so color varies smoothly front to back, interpolating per vertex
-    between <code>color1</code> at <code>z_min</code> and <code>color2</code> at <code>z_max</code>:
-    <code>color = alpha * color2 + (1 - alpha) * color1</code>.</p>
+  <h2>3. Re-texturing a Mesh <span class="points">10 points</span><span class="tag done">done</span></h2>
 
-  <div class="pending">Pending &mdash; drop the gif at <code>data/q3_retextured_cow.gif</code></div>
+  <figure>
+    <img src="data/q3_retextured_cow.gif" alt="Cow re-textured with a front-to-back color gradient" width="256">
+    <figcaption>A per-vertex blue-to-red gradient along the z-axis, rendered from 36 azimuth angles.</figcaption>
+  </figure>
 
   <div class="answer">
     <h4>Color choice</h4>
-    <p class="todo"><code>color1 = [_, _, _]</code> and <code>color2 = [_, _, _]</code> &mdash; describe why.</p>
+    <p>I selected <code>color1 = [0, 0, 1]</code> (blue at <code>z_min</code>) and
+      <code>color2 = [1, 0, 0]</code> (red at <code>z_max</code>).</p>
+    <p>Since blue and red don't share an RGB channel, interpolation gives each 
+      alpha value a unique color, smoothly transitioning through magenta. 
+      This gradient really helps us see depth. Colors that share a channel, 
+      like green and yellow, would blend together less clearly.
+    </p>
+    <p>Code: <code>part3.py</code></p>
   </div>
 </section>
 
 <!-- ============================ 4 ============================ -->
 <section class="q" id="q4">
-  <h2>4. Camera Transformations <span class="points">10 points</span><span class="tag todo">todo</span></h2>
-  <p class="prompt">For each target view, find <code>(R_relative, T_relative)</code> such that
-    <code>R = R_relative @ R_0</code> and <code>T = R_relative @ T_0 + T_relative</code>, and describe
-    in words what each transformation does.</p>
+  <h2>4. Camera Transformations <span class="points">10 points</span><span class="tag done">done</span></h2>
+  <p class="prompt">The baseline is <code>R_0 = I</code> and <code>T_0 = (0, 0, 3)</code>. Since these
+    are world-to-camera extrinsics, <code>R_relative</code> rotates the camera frame, and a positive
+    <code>T_relative</code> shifts the scene in camera coordinates.</p>
 
   <div class="row">
     <figure>
-      <div class="pending">Pending &mdash; <code>data/q4_transform1.jpg</code></div>
-      <figcaption>Transform 1 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+      <img src="data/q4_transform1.jpg" alt="Cow rotated 90 degrees in the image plane" width="256">
+      <figcaption><strong>1. In-plane roll.</strong>
+        <code>R_relative = [[0,1,0],[&minus;1,0,0],[0,0,1]]</code>, <code>T_relative = 0</code>.
+        This rotates the image 90&deg; about the camera's optical axis without changing the viewpoint, so
+        the cow appears to lie on its side.</figcaption>
     </figure>
     <figure>
-      <div class="pending">Pending &mdash; <code>data/q4_transform2.jpg</code></div>
-      <figcaption>Transform 2 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+      <img src="data/q4_transform2.jpg" alt="Cow seen from farther away" width="256">
+      <figcaption><strong>2. Move back.</strong>
+        <code>R_relative = I</code>, <code>T_relative = [0, 0, 2]</code>.
+        This moves the cow 2 units along <code>+z</code>, equivalent to moving the camera back. The cow
+        therefore appears smaller.</figcaption>
     </figure>
   </div>
   <div class="row">
     <figure>
-      <div class="pending">Pending &mdash; <code>data/q4_transform3.jpg</code></div>
-      <figcaption>Transform 3 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+      <img src="data/q4_transform3.jpg" alt="Cow shifted within the frame" width="256">
+      <figcaption><strong>3. In-plane translation.</strong>
+        <code>R_relative = I</code>, <code>T_relative = [0.5, &minus;0.5, 0]</code>.
+        This shifts the cow parallel to the image plane without changing its depth, size, or
+        orientation.</figcaption>
     </figure>
     <figure>
-      <div class="pending">Pending &mdash; <code>data/q4_transform4.jpg</code></div>
-      <figcaption>Transform 4 &mdash; <span class="todo">describe R_relative / T_relative</span></figcaption>
+      <img src="data/q4_transform4.jpg" alt="Cow seen from its left side" width="256">
+      <figcaption><strong>4. Orbit 90&deg;.</strong>
+        <code>R_relative = [[0,0,1],[0,1,0],[&minus;1,0,0]]</code>,
+        <code>T_relative = [&minus;3, 0, 3]</code>.
+        A 90&deg; rotation about the up axis directs the camera along the world <code>&minus;x</code>
+        axis. Because this rotation moves <code>T_0</code> to <code>(3,0,0)</code>, the translation
+        re-centers the cow and produces a side view.</figcaption>
     </figure>
+  </div>
+  <div class="answer">
+    <p>Code: <code>part4.py</code></p>
   </div>
 </section>
 
@@ -246,110 +266,175 @@
   <h2>5. Rendering Generic 3D Representations <span class="points">45 points</span></h2>
 
   <div class="subq" id="q5-1">
-    <h3>5.1 Rendering Point Clouds from RGB-D Images <span class="points">10 points</span><span class="tag todo">todo</span></h3>
-    <p class="prompt">Unproject two RGB-D plant images into point clouds and render three gifs
-      side-by-side: the first image's cloud, the second image's cloud, and their union.</p>
-
+    <h3>5.1 Rendering Point Clouds from RGB-D Images <span class="points">10 points</span><span class="tag done">done</span></h3>
     <div class="row">
       <figure>
-        <div class="pending">Pending &mdash; <code>data/q5_1_pointcloud1.gif</code></div>
-        <figcaption>Point cloud from image 1</figcaption>
+        <img src="data/q5_1_pointcloud1.gif" alt="Point cloud unprojected from the first plant image" width="256">
+        <figcaption>Image 1</figcaption>
       </figure>
       <figure>
-        <div class="pending">Pending &mdash; <code>data/q5_1_pointcloud2.gif</code></div>
-        <figcaption>Point cloud from image 2</figcaption>
+        <img src="data/q5_1_pointcloud2.gif" alt="Point cloud unprojected from the second plant image" width="256">
+        <figcaption>Image 2</figcaption>
       </figure>
       <figure>
-        <div class="pending">Pending &mdash; <code>data/q5_1_pointcloud_union.gif</code></div>
-        <figcaption>Union of both point clouds</figcaption>
+        <img src="data/q5_1_pointcloud_union.gif" alt="Union of both plant point clouds" width="256">
+        <figcaption>Union of both</figcaption>
       </figure>
+    </div>
+    <div class="answer">
+      <h4>Notes</h4>
+      <p>Both clouds are unprojected directly into world coordinates, so they can be combined with
+        <code>torch.cat</code> without registration.</p>
+      <p>Two implementation details require special handling. First, the stored cameras follow a
+        <em>y-down</em> convention, as indicated by <code>R[1,1] &asymp; &minus;1</code> in the saved
+        extrinsics. The turntable therefore uses <code>up=((0, -1, 0),)</code> to keep the plant
+        upright. Second, pixels without valid depth values unproject to <code>NaN</code>, which prevents
+        the renderer from computing a valid bounding box. These non-finite points are removed before
+        rendering.
+      </p>
+      <p>Code: <code>part5.py</code>, <code>--render plant_rgbd</code></p>
     </div>
   </div>
 
   <div class="subq" id="q5-2">
-    <h3>5.2 Parametric Functions <span class="points">10 + 5 points</span><span class="tag todo">todo</span></h3>
-    <p class="prompt">A 360-degree gif of a torus point cloud sampled from its parametric function
-      (with the hole visible), plus a second gif of any new object of your choice.</p>
-
+    <h3>5.2 Parametric Functions <span class="points">10 + 5 points</span><span class="tag done">done</span></h3>
     <div class="row">
       <figure>
-        <div class="pending">Pending &mdash; <code>data/q5_2_torus.gif</code></div>
-        <figcaption>Torus point cloud</figcaption>
+        <img src="data/q5_2_torus.gif" alt="Torus point cloud sampled from its parametric function" width="256">
+        <figcaption>Torus with <code>R = 1.0</code>, <code>r = 0.3</code>, 400&times;400 samples</figcaption>
       </figure>
       <figure>
-        <div class="pending">Pending &mdash; <code>data/q5_2_custom.gif</code></div>
-        <figcaption><span class="todo">New parametric object &mdash; name it</span></figcaption>
+        <img src="data/q5_2_custom.gif" alt="Mobius strip point cloud" width="256">
+        <figcaption>M&ouml;bius strip (new object), 200&times;200 samples</figcaption>
       </figure>
+    </div>
+    <div class="answer">
+      <h4>Parameterizations</h4>
+      <p>The torus is parameterized as <code>x = (R + r&middot;cos&theta;)cos&phi;</code>,
+        <code>y = (R + r&middot;cos&theta;)sin&phi;</code>, and <code>z = r&middot;sin&theta;</code>, sampled
+        over <code>(&phi;, &theta;) &isin; [0, 2&pi;]&sup2;</code>.</p>
+      <p>The second object is a M&ouml;bius strip, parameterized as
+        <code>x = (1 + v&middot;cos(u/2))cos u</code>,
+        <code>y = (1 + v&middot;cos(u/2))sin u</code>, and <code>z = v&middot;sin(u/2)</code>. The
+        <code>u/2</code> term introduces a half-twist, creating a single-sided surface with a topology
+        distinct from that of the torus. </p>
+      <p>Code: <code>part5.py</code></p>
     </div>
   </div>
 
   <div class="subq" id="q5-3">
-    <h3>5.3 Implicit Surfaces <span class="points">15 + 5 points</span><span class="tag todo">todo</span></h3>
-    <p class="prompt">A 360-degree gif of a torus rendered as a mesh from an implicit function, a
-      discussion of mesh vs. point cloud tradeoffs, and a gif of another object of your choice.</p>
-
+    <h3>5.3 Implicit Surfaces <span class="points">15 + 5 points</span><span class="tag done">done</span></h3>
     <div class="row">
       <figure>
-        <div class="pending">Pending &mdash; <code>data/q5_3_torus_mesh.gif</code></div>
-        <figcaption>Torus mesh from an implicit function</figcaption>
+        <img src="data/q5_3_torus_mesh.gif" alt="Torus mesh extracted from an implicit function" width="256">
+        <figcaption>Torus mesh from a 64&sup3; grid plus marching cubes</figcaption>
       </figure>
       <figure>
-        <div class="pending">Pending &mdash; <code>data/q5_3_custom.gif</code></div>
-        <figcaption><span class="todo">New implicit object &mdash; name it</span></figcaption>
+        <img src="data/q5_3_custom.gif" alt="Gyroid minimal surface mesh" width="256">
+        <figcaption>Gyroid (new object), 96&sup3; grid</figcaption>
       </figure>
+    </div>
+    <div class="answer">
+      <h4>Implicit functions</h4>
+      <p>The torus is defined as the zero level set of
+        <code>F = (sqrt(x&sup2; + y&sup2;) &minus; R)&sup2; + z&sup2; &minus; r&sup2;</code>.
+        The function is evaluated on a 64&sup3; grid, and the surface is extracted using
+        <code>mcubes.marching_cubes</code>. Because the resulting vertices are expressed in voxel-index
+        space, they must be rescaled to world coordinates.</p>
+      <p>The second object is a gyroid defined by
+        <code>sin x&middot;cos y + sin y&middot;cos z + sin z&middot;cos x = 0</code>. It is a
+        triply periodic minimal surface without a simple parametric form, making an implicit
+        representation well suited to this geometry. </p>
+      <p>Code: <code>part5.py</code></p>
     </div>
 
     <div class="answer">
       <h4>Mesh vs. point cloud tradeoffs</h4>
-      <p class="todo">Compare rendering speed, rendering quality, memory usage, and ease of use.</p>
+      <p><strong>Rendering quality.</strong> Mesh faces create a seamless surface, which means you get 
+        smooth shading and accurate occlusion. Point clouds, on the other hand, reveal gaps when you get close, 
+        and points from the background can peek through at slight angles. The quality of the mesh still hinges 
+        on how many voxels are used: at 64&sup3;, the torus looks a bit faceted.</p>
+      <p><strong>Rendering speed.</strong> At comparable quality, the mesh is faster here: roughly 10k
+        triangles versus 160,000 points for a solid-looking torus. Point clouds are easy to subsample,
+        while meshes require decimation.</p>
+      <p><strong>Memory.</strong> Point clouds use less memory per primitive because they store only position and color,
+        without connectivity. However, the implicit-surface pipeline requires a dense intermediate grid. The
+        96&sup3; gyroid grid contains approximately 885,000 values before marching cubes begins, and
+        this cost grows cubically with resolution.</p>
+      <p><strong>Ease of use.</strong> Point Cloud is easiest to acquire and process initially, as raw sensor data 
+        can be used directly without managing complex surfaces or topology.
+        Mesh takes more effort to build up front, but is much easier to use in downstream applications like rendering, 
+        3D editing, and physics simulations thanks to its defined surfaces and structural normals.</p>
     </div>
   </div>
 </section>
 
 <!-- ============================ 6 ============================ -->
 <section class="q" id="q6">
-  <h2>6. Do Something Fun <span class="tag ec">extra credit &middot; +10</span><span class="tag todo">todo</span></h2>
-  <p class="prompt">A creative use of the tools from this assignment.</p>
+  <h2>6. Do Something Fun <span class="tag ec">extra credit &middot; +10</span><span class="tag done">done</span></h2>
 
-  <div class="pending">Pending &mdash; drop the result at <code>data/q6_fun.gif</code></div>
+  <figure>
+    <img src="data/q6_fun.gif" alt="Two metaballs merging and separating as an implicit surface" width="256">
+    <figcaption>A 48-frame metaball morph. Each frame is generated by applying marching cubes to an 80&sup3;
+      grid while the camera simultaneously orbits the surface.</figcaption>
+  </figure>
 
   <div class="answer">
     <h4>What this is</h4>
-    <p class="todo">Describe what you made and how.</p>
+    <p>Two metaballs orbit toward each other and then apart again. The surface is the zero level-set of
+      a time-varying implicit function,</p>
+    <pre><code>F(x, t) = &Sigma;&#7522; r&sup2; / ||x &minus; c&#7522;(t)||&sup2; &minus; 1</code></pre>
+    <p>which I re-evaluate on the voxel grid and re-mesh at every frame. What makes this interesting is
+      that the surface <strong>changes topology</strong> partway through. When the balls are far apart
+      it has two connected components, and once they get close enough those merge into a single one. A
+      mesh with fixed connectivity cannot represent this, and neither can a parametric function, since
+      both have their topology fixed from the start. An implicit function gives it to you for free,
+      which is exactly the advantage I described in 5.3.</p>
+    <p>The merge threshold is also predictable. At the midpoint between the two centers the field
+      reduces to <code>2r&sup2;/s&sup2; &minus; 1</code>, so the lobes first touch when
+      <code>s = r&radic;2</code>. With <code>r = 0.78</code> that works out to <code>1.1031</code>. To
+      confirm this, I counted the connected components of the extracted mesh across the animation:
+      every sampled frame below that separation produced one component and every frame above it
+      produced two, with no mismatches.</p>
+    <p>The balls also counter-rotate in the xy-plane, and the separation follows a cosine, so the loop
+      joins up seamlessly and the merge stays visible from more than one viewing angle.</p>
+    <p>Code: <code>part6.py</code></p>
   </div>
 </section>
 
 <!-- ============================ 7 ============================ -->
 <section class="q" id="q7">
-  <h2>7. Sampling Points on Meshes <span class="tag ec">extra credit &middot; +10</span><span class="tag todo">todo</span></h2>
-  <p class="prompt">Uniformly sample the cow mesh surface via stratified sampling (face area &rarr;
-    barycentric coordinate) at 10, 100, 1000, and 10000 points, each rendered side-by-side with the
-    original mesh.</p>
+  <h2>7. Sampling Points on Meshes <span class="tag ec">extra credit &middot; +10</span><span class="tag done">done</span></h2>
 
   <div class="row">
     <figure>
-      <div class="pending">Pending &mdash; <code>data/q7_sample_10.gif</code></div>
-      <figcaption>10 sampled points vs. cow mesh</figcaption>
-    </figure>
-    <figure>
-      <div class="pending">Pending &mdash; <code>data/q7_sample_100.gif</code></div>
-      <figcaption>100 sampled points vs. cow mesh</figcaption>
+      <img src="data/q7_sample_10.gif" alt="10 sampled points beside the cow mesh" width="512">
+      <figcaption>10 points (left) next to the original mesh (right)</figcaption>
     </figure>
   </div>
   <div class="row">
     <figure>
-      <div class="pending">Pending &mdash; <code>data/q7_sample_1000.gif</code></div>
-      <figcaption>1000 sampled points vs. cow mesh</figcaption>
-    </figure>
-    <figure>
-      <div class="pending">Pending &mdash; <code>data/q7_sample_10000.gif</code></div>
-      <figcaption>10000 sampled points vs. cow mesh</figcaption>
+      <img src="data/q7_sample_100.gif" alt="100 sampled points beside the cow mesh" width="512">
+      <figcaption>100 points</figcaption>
     </figure>
   </div>
+  <div class="row">
+    <figure>
+      <img src="data/q7_sample_1000.gif" alt="1000 sampled points beside the cow mesh" width="512">
+      <figcaption>1000 points</figcaption>
+    </figure>
+  </div>
+  <div class="row">
+    <figure>
+      <img src="data/q7_sample_10000.gif" alt="10000 sampled points beside the cow mesh" width="512">
+      <figcaption>10000 points</figcaption>
+    </figure>
+  </div>
+
 </section>
 
 <footer class="page">
-  <p>Code for this assignment lives on the <code>master</code> branch of this repository.</p>
+  <p>The code for this assignment is available on the repository's <code>master</code> branch.</p>
 </footer>
 
 </div>
